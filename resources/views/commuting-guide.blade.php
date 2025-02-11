@@ -9,7 +9,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyACtmc6ZSEVHBJLkk9wtiRj5ssvW1RDh4s&libraries=places,geometry,directions"></script>
      <!-- Favicons -->
-  <link href="{{ asset('img/favicon.png') }}" rel="icon">
+     <link href="{{ asset('img/lakbe2.png') }}" rel="icon">
 <link href="{{ asset('img/apple-touch-icon.png') }}" rel="apple-touch-icon">
 
 

@@ -8,7 +8,7 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyACtmc6ZSEVHBJLkk9wtiRj5ssvW1RDh4s&libraries=places"></script>
 
     <!-- Favicons -->
-  <link href="{{ asset('img/lakbe.png') }}" rel="icon">
+    <link href="{{ asset('img/lakbe2.png') }}" rel="icon">
 <link href="{{ asset('img/apple-touch-icon.png') }}" rel="apple-touch-icon">
 
 
