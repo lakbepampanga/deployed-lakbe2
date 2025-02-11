@@ -284,7 +284,7 @@
     <!-- Hero Section -->
     <section class="hero text-center bg-white">
     <div>
-        <h1 class="display-3 fw-bold">Lakbe Pampanga</h1>
+        <h1 class="display-3 fw-bold">TESTING</h1>
         <p class="lead">Explore Pampanga’s First District with ease—find the best routes, top spots<br>and convenient jeepney rides.</p>
 
         <div class="text-center mt-4">
