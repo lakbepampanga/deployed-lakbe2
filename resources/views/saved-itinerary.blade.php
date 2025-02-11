@@ -83,52 +83,63 @@
                             <p class="mb-2"><strong>Duration:</strong> {{ $itinerary->duration_hours }} hours</p>
 
                             <div class="destinations-list">
-                                @foreach($itinerary->itinerary_data as $index => $destination)
-                                    <div class="destination-item mb-3 p-3 bg-light rounded">
-                                        <h6 class="mb-0">{{ $index + 1 }}. {{ $destination['name'] }}</h6>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <p class="text-muted small mb-1">{{ $destination['description'] }}</p>
-                                            
-                                            @if(isset($destination['visited']) && $destination['visited'])
-                                                <span class="badge bg-success">
-                                                    <i class="bi bi-check-circle-fill"></i> Visited
-                                                </span>
-                                            @else
-                                                <form action="{{ route('destinations.markVisited') }}" method="POST" class="mark-visited-form">
-                                                    @csrf
-                                                    <input type="hidden" name="destination_id" value="{{ $destination['name'] }}" required>
-                                                    <input type="hidden" name="saved_itinerary_id" value="{{ $itinerary->id }}" required>
-                                                    <button type="submit" class="btn btn-sm btn-outline-success">
-                                                        <i class="bi bi-check-circle"></i> Mark Visited
-                                                    </button>
-                                                </form>
-                                            @endif
-                                        </div>
-                                        
-                                        <div class="small">
-                                            <span class="badge bg-primary">{{ $destination['type'] }}</span>
-                                            <span class="ms-2">{{ $destination['visit_time'] }} mins</span>
-                                        </div>
-                                        
-                                        <div class="small mt-2">
-                                            <strong>Travel:</strong> {{ $destination['travel_time'] }} mins
-                                        </div>
-                                        
-                                        <div class="small mt-1">
-                                            <strong>Route:</strong> {{ $destination['commute_instructions'] }}
-                                            <button type="button" 
-                                                class="btn btn-sm btn-link text-danger report-instructions" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#reportModal"
-                                                data-destination="{{ $destination['name'] }}"
-                                                data-instructions="{{ $destination['commute_instructions'] }}"
-                                                data-itinerary-id="{{ $itinerary->id }}">
-                                                <i class="bi bi-exclamation-triangle"></i> Report Issue
-                                            </button>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
+    @foreach($itinerary->itinerary_data as $index => $destination)
+        <div class="destination-item mb-3 p-3 bg-light rounded">
+            <h6 class="mb-0">{{ $index + 1 }}. {{ $destination['name'] }}</h6>
+            <div class="d-flex justify-content-between align-items-center">
+                <p class="text-muted small mb-1">{{ $destination['description'] }}</p>
+
+                @if(isset($destination['visited']) && $destination['visited'])
+                    <span class="badge bg-success">
+                        <i class="bi bi-check-circle-fill"></i> Visited
+                    </span>
+                @else
+                    <form action="{{ route('destinations.markVisited') }}" method="POST" class="mark-visited-form">
+                        @csrf
+                        <input type="hidden" name="destination_id" value="{{ $destination['name'] }}" required>
+                        <input type="hidden" name="saved_itinerary_id" value="{{ $itinerary->id }}" required>
+                        <button type="submit" class="btn btn-sm btn-outline-success">
+                            <i class="bi bi-check-circle"></i> Mark Visited
+                        </button>
+                    </form>
+                @endif
+            </div>
+
+            <div class="small">
+                <span class="badge bg-primary">{{ $destination['type'] }}</span>
+                <span class="ms-2">{{ $destination['visit_time'] }} mins</span>
+            </div>
+
+            <div class="small mt-2">
+                <strong>Travel:</strong> {{ $destination['travel_time'] }} mins
+            </div>
+
+            <div class="small mt-1">
+                <strong>Route:</strong> 
+                @if(is_array($destination['commute_instructions']))
+                    <ul>
+                        @foreach($destination['commute_instructions'] as $instruction)
+                            <li>{{ $instruction }}</li>
+                        @endforeach
+                    </ul>
+                @else
+                    {{ $destination['commute_instructions'] }}
+                @endif
+
+                <button type="button" 
+                    class="btn btn-sm btn-link text-danger report-instructions" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#reportModal"
+                    data-destination="{{ $destination['name'] }}"
+                    data-instructions="{{ is_array($destination['commute_instructions']) ? implode(', ', $destination['commute_instructions']) : $destination['commute_instructions'] }}"
+                    data-itinerary-id="{{ $itinerary->id }}">
+                    <i class="bi bi-exclamation-triangle"></i> Report Issue
+                </button>
+            </div>
+        </div>
+    @endforeach
+</div>
+
 
                             <div class="d-flex justify-content-between mt-3">
                                 <form action="{{ route('itineraries.destroy', $itinerary->id) }}"
