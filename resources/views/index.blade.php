@@ -48,9 +48,7 @@
     transition: 0.3s;   /* Hover border color */
 }
 
-        #itinerary {
-            margin-top: 20px;
-        }
+    
         #itinerary ul {
             list-style-type: none;
             padding: 0;
@@ -62,6 +60,32 @@
             margin-top: 20px;
         }
 
+ /* Prevent scrolling inside the modal */
+    #mapModal .modal-dialog {
+        height: 100dvh; /* Dynamic viewport height to prevent extra scrolling */
+        margin: 0;
+        max-width: 100vw;
+    }
+
+    #mapModal .modal-content {
+        height: 100dvh; /* Prevents scrolling inside the modal */
+        display: flex;
+        flex-direction: column;
+    }
+
+    #mapModal .modal-body {
+        flex-grow: 1;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden; /* Prevents scrolling inside modal */
+    }
+
+    #map-popup {
+        width: 100%;
+        height: 100%;
+    }
 
 /* Form Styling */
 

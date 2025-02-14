@@ -42,16 +42,30 @@
             width: 100%;
             margin-top: 20px;
         }
-        #commute-guide {
-            margin-top: 20px;
-        }
-        #commute-guide ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        #commute-guide li {
-            margin-bottom: 15px;
-        }
+       /* Ensure result section and map container match in height */
+#result-section, #map-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+    align-items: stretch;
+}
+
+#commute-guide, #map {
+    flex-grow: 1; /* Ensures they stretch evenly */
+    min-height: 500px; /* Ensures minimum height */
+}
+
+/* Ensure the commute guide list has no unwanted gaps */
+#commute-guide ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#commute-guide li {
+    margin-bottom: 15px;
+}
+
 
         .btn-custom{
     background-color: var(--button-color); /* Desired background color */
@@ -203,6 +217,32 @@
     }
 }
 
+   /* Prevent scrolling inside the modal */
+    #mapModal .modal-dialog {
+        height: 100dvh; /* Dynamic viewport height to prevent extra scrolling */
+        margin: 0;
+        max-width: 100vw;
+    }
+
+    #mapModal .modal-content {
+        height: 100dvh; /* Prevents scrolling inside the modal */
+        display: flex;
+        flex-direction: column;
+    }
+
+    #mapModal .modal-body {
+        flex-grow: 1;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden; /* Prevents scrolling inside modal */
+    }
+
+    #map-popup {
+        width: 100%;
+        height: 100%;
+    }
 
     </style>
 </head>
@@ -314,19 +354,19 @@
 
     <!-- Mobile Map Modal -->
     <div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-fullscreen">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Map View</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- The same map will be loaded here for mobile view -->
-                    <div id="map-popup" class="w-100 rounded shadow-sm" style="height: 100vh;"></div>
-                </div>
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Map View</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- The same map will be loaded here for mobile view -->
+                <div id="map-popup" class="w-100 rounded shadow-sm"></div>
             </div>
         </div>
     </div>
+</div>
 </main>
 
 
@@ -1035,6 +1075,8 @@ document.addEventListener('click', function(e) {
         myModal.show();
     }
 </script>
+
+
 
 
 </body>
