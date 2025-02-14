@@ -114,8 +114,7 @@ class AdminController extends Controller
             'priority' => 'required|integer|min:1',
             'opening_time' => 'nullable|date_format:H:i',
             'closing_time' => 'nullable|date_format:H:i',
-            'route_id' => 'nullable|exists:jeepney_routes,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'route_id' => 'nullable|exists:jeepney_routes,id'
         ]);
     
         // Create destination data array
@@ -166,7 +165,7 @@ class AdminController extends Controller
             'opening_time' => 'nullable|date_format:H:i',
             'closing_time' => 'nullable|date_format:H:i',
             'route_id' => 'nullable|exists:jeepney_routes,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image
+            'image' => 'nullable|mimes:jpeg,png,jpg,gif,svg,webp|max:2048', // Validate image
         ]);
     
         // Handle image upload
@@ -208,7 +207,7 @@ class AdminController extends Controller
         'route_name' => 'required|string|max:255',
         'route_color' => 'nullable|string|max:50',
         'description' => 'nullable|string',
-        'route_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+        'route_image' => 'nullable|mimes:jpeg,png,jpg,gif,svg,webp|max:2048'
     ]);
 
     $routeData = $validated;
@@ -231,7 +230,7 @@ public function updateRoute(Request $request, JeepneyRoute $route)
         'route_name' => 'required|string|max:255',
         'route_color' => 'nullable|string|max:50',
         'description' => 'nullable|string',
-        'route_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'route_image' => 'nullable|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
         'remove_image' => 'nullable|boolean'
     ]);
 

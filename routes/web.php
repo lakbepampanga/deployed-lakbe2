@@ -13,6 +13,8 @@ use App\Http\Controllers\DestinationVisitController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\CommutingReportController;
 use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\HomeController;
+
 
 
 // Public routes
@@ -44,9 +46,7 @@ Route::middleware(['auth'])->group(function () {
     })->name('index');
 
     // User-Homepage
-    Route::get('/user-home', function () {
-        return view('user-home');
-    })->name('user-home');
+    Route::get('/user-home', [HomeController::class, 'index'])->name('user-home');
     
     // Commuting Guide
     Route::get('/commuting-guide', function () {
@@ -61,6 +61,7 @@ Route::middleware(['auth'])->group(function () {
     
     // Saved Itineraries
     Route::get('/saved-itinerary', [SavedItineraryController::class, 'index'])->name('saved-itinerary');
+    Route::put('/itineraries/{id}', [SavedItineraryController::class, 'update'])->name('itineraries.update');
     Route::delete('/itineraries/{itinerary}', [SavedItineraryController::class, 'destroy'])->name('itineraries.destroy');
     
     // Destination visits

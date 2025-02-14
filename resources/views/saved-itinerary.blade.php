@@ -7,7 +7,7 @@
             <h1 class="sitename">Lakbe Pampanga</h1>
         </a> -->
 
-        <a href="/" class="logo d-flex align-items-center">
+        <a href="/user-home" class="logo d-flex align-items-center">
             <img src="{{ asset('img/lakbe-logo1.png') }}" alt="Lakbe Pampanga Logo" class="img-fluid">
         </a>
 
@@ -46,6 +46,88 @@
 .badge.bg-success {
     font-size: 0.875rem;
 }
+
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.custom-toast {
+    min-width: 300px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.custom-toast.show {
+    opacity: 1;
+}
+
+.toast-success {
+    border-left: 4px solid #198754;
+}
+
+.toast-error {
+    border-left: 4px solid #dc3545;
+}
+
+.editable-title .edit-title-btn {
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.editable-title:hover .edit-title-btn {
+    opacity: 1;
+}
+
+.edit-title-form .input-group {
+    max-width: 300px;
+}
+
+.editable-title .edit-title-btn {
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    vertical-align: middle;
+}
+
+.editable-title:hover .edit-title-btn {
+    opacity: 0.7;
+}
+
+.editable-title .edit-title-btn:hover {
+    opacity: 1;
+}
+
+.editable-title .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.edit-title-form .input-group {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.edit-title-form .form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+.edit-title-form .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 34px;
+    padding: 0;
+}
+
+.edit-title-form .btn i {
+    font-size: 1rem;
+}
 </style>
 
 <main class="main container mt-5 pt-5">
@@ -75,10 +157,41 @@
                         data-map-container="map-container-{{ $itinerary->id }}">
 
                         <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <h5 class="card-title">{{ $itinerary->name }}</h5>
-                                <small class="text-muted">{{ $itinerary->created_at->format('M d, Y') }}</small>
-                            </div>
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="editable-title" data-itinerary-id="{{ $itinerary->id }}">
+    <div class="d-flex align-items-center mb-0">
+        <h5 class="card-title mb-0 me-2">
+            <span class="itinerary-name">{{ $itinerary->name }}</span>
+            <button class="btn btn-link btn-sm edit-title-btn p-0 ms-1" title="Edit title">
+                <i class="bi bi-pencil-fill text-muted" style="font-size: 0.8rem;"></i>
+            </button>
+        </h5>
+    </div>
+    
+    <form class="edit-title-form d-none">
+        @csrf
+        <div class="input-group input-group-sm mt-2" style="max-width: 300px;">
+            <input 
+                type="text" 
+                name="name" 
+                class="form-control shadow-none" 
+                value="{{ $itinerary->name }}" 
+                required
+                placeholder="Enter itinerary name"
+            >
+            <button type="submit" class="btn btn-primary px-3">
+                <i class="bi bi-check-lg"></i>
+            </button>
+            <button type="button" class="btn btn-outline-secondary cancel-edit px-3">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+    </form>
+</div>
+
+
+    <small class="text-muted">{{ $itinerary->created_at->format('M d, Y') }}</small>
+</div>
 
                             <p class="mb-2"><strong>Duration:</strong> {{ $itinerary->duration_hours }} hours</p>
 
@@ -115,13 +228,22 @@
                                         </div>
                                         
                                         <div class="small mt-1">
-                                            <strong>Route:</strong> {{ $destination['commute_instructions'] }}
+                                        <strong>Route:</strong> 
+                                        @if(is_array($destination['commute_instructions']))
+                                            @foreach($destination['commute_instructions'] as $instruction)
+                                                {{ $instruction['instruction'] }}
+                                            @endforeach
+                                        @else
+                                            {{ $destination['commute_instructions'] }}
+                                        @endif
                                             <button type="button" 
                                                 class="btn btn-sm btn-link text-danger report-instructions" 
                                                 data-bs-toggle="modal" 
                                                 data-bs-target="#reportModal"
                                                 data-destination="{{ $destination['name'] }}"
-                                                data-instructions="{{ $destination['commute_instructions'] }}"
+                                                data-instructions="{{ is_array($destination['commute_instructions']) ? 
+                                                implode(' ', array_map(function($i) { return $i['instruction']; }, $destination['commute_instructions'])) : 
+                                                $destination['commute_instructions'] }}"
                                                 data-itinerary-id="{{ $itinerary->id }}">
                                                 <i class="bi bi-exclamation-triangle"></i> Report Issue
                                             </button>
@@ -131,15 +253,15 @@
                             </div>
 
                             <div class="d-flex justify-content-between mt-3">
-                                <form action="{{ route('itineraries.destroy', $itinerary->id) }}"
-                                    method="POST"
-                                    onsubmit="return confirm('Are you sure you want to delete this itinerary?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        <i class="bi bi-trash"></i> Delete
-                                    </button>
-                                </form>
+                            <form action="{{ route('itineraries.destroy', $itinerary->id) }}"
+                                method="POST"
+                                class="delete-itinerary-form">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
+                            </form>
                             </div>
                             <!-- View Map Button (Mobile Only) -->
                             <button class="btn btn-outline-primary w-100 mt-3 d-md-none view-map-btn" 
@@ -221,6 +343,44 @@
 
 @push('scripts')
 <script>
+
+function showToast(message, type = 'success') {
+    // Create toast container if it doesn't exist
+    let toastContainer = document.querySelector('.toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.className = 'toast-container';
+        document.body.appendChild(toastContainer);
+    }
+
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `custom-toast toast-${type} p-3 mb-2`;
+    toast.innerHTML = `
+        <div class="d-flex align-items-center">
+            <div class="toast-body flex-grow-1">
+                <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                ${message}
+            </div>
+            <button type="button" class="btn-close ms-2" onclick="this.parentElement.parentElement.remove()"></button>
+        </div>
+    `;
+
+    // Add toast to container
+    toastContainer.appendChild(toast);
+
+    // Trigger reflow and add show class
+    toast.offsetHeight;
+    toast.classList.add('show');
+
+    // Remove toast after 3 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }, 3000);
+}
 document.addEventListener("DOMContentLoaded", function () {
     let maps = {};
     let markers = {};
@@ -375,6 +535,244 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Trigger map resize event to make it display properly in the modal
             google.maps.event.trigger(modalMap, "resize");
+        });
+    });
+});
+
+// Add this to your existing scripts section
+document.addEventListener('DOMContentLoaded', function() {
+    const visitedForms = document.querySelectorAll('.mark-visited-form');
+    
+    visitedForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
+                    'Accept': 'application/json',
+                },
+                body: new FormData(form)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const visitedBadge = `
+                        <span class="badge bg-success">
+                            <i class="bi bi-check-circle-fill"></i> Visited
+                        </span>
+                    `;
+                    form.outerHTML = visitedBadge;
+                    showToast(data.message, 'success');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('An error occurred while marking the destination as visited.', 'error');
+            });
+        });
+    });
+});
+
+// Add this to your existing scripts section
+document.addEventListener('DOMContentLoaded', function() {
+    // Set up report button click handlers
+    const reportButtons = document.querySelectorAll('.report-instructions');
+    reportButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Get the data from the button's data attributes
+            const destination = this.getAttribute('data-destination');
+            const instructions = this.getAttribute('data-instructions');
+            const itineraryId = this.getAttribute('data-itinerary-id');
+            
+            // Set the values in the modal form
+            document.getElementById('reportDestination').value = destination;
+            document.getElementById('reportItinerary').value = itineraryId;
+            document.getElementById('reportCurrentInstructions').value = instructions;
+        });
+    });
+
+// Handle report form submission
+// Handle report form submission
+const reportForm = document.getElementById('reportForm');
+    const reportModal = document.getElementById('reportModal');
+
+    // Add event listener for when modal is hidden
+    reportModal.addEventListener('hidden.bs.modal', function () {
+        // Clean up modal-related styles and classes
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+            backdrop.remove();
+        }
+    });
+
+    reportForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    fetch(this.action, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+            'Accept': 'application/json',
+        },
+        body: new FormData(this)
+    })
+    .then(response => response.json())
+    .then(data => {
+        const modal = bootstrap.Modal.getInstance(reportModal);
+        modal.hide();
+        
+        if (data.success) {
+            showToast(data.message, 'success');
+            this.reset();
+        } else {
+            showToast(data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        const modal = bootstrap.Modal.getInstance(reportModal);
+        modal.hide();
+        showToast('An error occurred while submitting the report.', 'error');
+    });
+});
+
+});
+
+// Add event listener for delete forms
+document.querySelectorAll('form[action*="itineraries/"]').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        if (!confirm('Are you sure you want to delete this itinerary?')) {
+            e.preventDefault();
+            return;
+        }
+        
+        e.preventDefault();
+        
+        // Create form data and append the _method field for Laravel
+        const formData = new FormData(this);
+        formData.append('_method', 'DELETE'); // Add this line for Laravel method spoofing
+
+        fetch(this.action, {
+            method: 'POST', // Keep this as POST
+            headers: {
+                'X-CSRF-TOKEN': this.querySelector('input[name="_token"]').value,
+                'Accept': 'application/json',
+            },
+            body: formData
+        })
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+                return;
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.success) {
+                // Remove the itinerary card
+                const itineraryCard = this.closest('.d-flex.gap-4');
+                if (itineraryCard) {
+                    itineraryCard.remove();
+                }
+                showToast('Itinerary deleted successfully', 'success');
+                
+                // Check if there are no more itineraries
+                const remainingItineraries = document.querySelectorAll('.itinerary-card');
+                if (remainingItineraries.length === 0) {
+                    // Show the empty state message
+                    const container = document.querySelector('.container.py-4');
+                    container.innerHTML = `
+                        <div class="text-center">
+                            <p class="text-muted">You haven't saved any itineraries yet.</p>
+                            <a href="/index" class="btn btn-custom">Create New Itinerary</a>
+                        </div>
+                    `;
+                }
+            } else {
+                window.location.reload(); // Fallback to page reload if response is not as expected
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('An error occurred while deleting the itinerary', 'error');
+        });
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle edit button clicks
+    document.querySelectorAll('.edit-title-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const titleContainer = this.closest('.editable-title');
+            const form = titleContainer.querySelector('.edit-title-form');
+            const titleDisplay = titleContainer.querySelector('.itinerary-name');
+            
+            // Show form, hide display
+            form.classList.remove('d-none');
+            titleDisplay.parentElement.classList.add('d-none');
+            
+            // Focus input
+            form.querySelector('input').focus();
+        });
+    });
+    
+    // Handle cancel button clicks
+    document.querySelectorAll('.cancel-edit').forEach(button => {
+        button.addEventListener('click', function() {
+            const titleContainer = this.closest('.editable-title');
+            const form = titleContainer.querySelector('.edit-title-form');
+            const titleDisplay = titleContainer.querySelector('.itinerary-name');
+            
+            // Hide form, show display
+            form.classList.add('d-none');
+            titleDisplay.parentElement.classList.remove('d-none');
+        });
+    });
+    
+    // Handle form submissions
+    document.querySelectorAll('.edit-title-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const titleContainer = this.closest('.editable-title');
+            const itineraryId = titleContainer.dataset.itineraryId;
+            const input = this.querySelector('input[name="name"]');
+            const titleDisplay = titleContainer.querySelector('.itinerary-name');
+            const csrfToken = this.querySelector('input[name="_token"]').value;
+            
+            fetch(`/itineraries/${itineraryId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: new URLSearchParams({
+                    '_method': 'PUT',
+                    'name': input.value
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    titleDisplay.textContent = input.value; // Use the input value directly
+                    form.classList.add('d-none');
+                    titleDisplay.parentElement.classList.remove('d-none');
+                    showToast('Itinerary name updated successfully', 'success');
+                } else {
+                    showToast(data.error || 'Failed to update itinerary name', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('An error occurred while updating the itinerary name', 'error');
+            });
         });
     });
 });

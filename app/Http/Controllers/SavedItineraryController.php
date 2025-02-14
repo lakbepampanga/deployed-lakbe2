@@ -50,19 +50,63 @@ class SavedItineraryController extends Controller
         return view('saved-itinerary', compact('itineraries'));
     }
 
-    public function destroy($id)
-    {
-        try {
-            $itinerary = SavedItinerary::where('user_id', auth()->id())
-                ->findOrFail($id);
-                
-            $itinerary->delete();
+public function destroy($id)
+{
+    try {
+        $itinerary = SavedItinerary::where('user_id', auth()->id())
+            ->findOrFail($id);
             
-            return redirect()->back()
-                ->with('success', 'Itinerary deleted successfully');
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Failed to delete itinerary');
+        $itinerary->delete();
+        
+        if (request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Itinerary deleted successfully'
+            ]);
         }
+        
+        return redirect()->back()
+            ->with('success', 'Itinerary deleted successfully');
+    } catch (\Exception $e) {
+        if (request()->wantsJson()) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to delete itinerary'
+            ], 500);
+        }
+        
+        return redirect()->back()
+            ->with('error', 'Failed to delete itinerary');
     }
+}
+
+public function update(Request $request, $id)
+{
+    try {
+        $itinerary = SavedItinerary::where('user_id', auth()->id())
+            ->findOrFail($id);
+            
+        $validated = $request->validate([
+            'name' => 'required|string|max:255'
+        ]);
+        
+        $itinerary->update([
+            'name' => $validated['name']
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Itinerary name updated successfully',
+            'name' => $validated['name']
+        ]);
+        
+    } catch (\Exception $e) {
+        \Log::error('Itinerary update error: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'error' => 'Failed to update itinerary name'
+        ], 500);
+    }
+}
+
 }

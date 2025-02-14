@@ -45,6 +45,85 @@
     color: white;
     transition: 0.3s;   /* Hover border color */
 }
+.full-description {
+    transition: opacity 0.3s ease;
+    cursor: pointer;
+}
+
+/* Saved Itineraries Section */
+.saved-itineraries-slider {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: var(--surface-color, #ffffff);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: var(--button-color, #609966) transparent;
+}
+
+/* Hide scrollbar for WebKit browsers */
+.saved-itineraries-slider::-webkit-scrollbar {
+    height: 6px;
+}
+
+.saved-itineraries-slider::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.saved-itineraries-slider::-webkit-scrollbar-thumb {
+    background: var(--button-color, #609966);
+    border-radius: 4px;
+}
+
+.itinerary-card {
+    min-width: 24rem;
+    height: 15rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    scroll-snap-align: start;
+}
+
+.itinerary-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.itinerary-card .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.itinerary-card .card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--heading-color, #40513B);
+}
+
+.itinerary-card .card-text {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .saved-itineraries-slider {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+    }
+
+    .itinerary-card {
+        min-width: 20rem;
+        height: auto;
+    }
+}
 
 
 </style>
@@ -60,7 +139,7 @@
             <h1 class="sitename">Lakbe Pampanga</h1>
         </a> -->
 
-        <a href="/" class="logo d-flex align-items-center">
+        <a href="/user-home" class="logo d-flex align-items-center">
             <img src="{{ asset('img/lakbe-logo1.png') }}" alt="Lakbe Pampanga Logo" class="img-fluid">
         </a>
 
@@ -86,69 +165,70 @@
 
 <main class="main container mt-5">
     <!-- Most Visited Places -->
-    <section class="mb-5 mt-5 bg-white " id="visited">
+    <section class="mb-5 mt-5 bg-white" id="visited">
     <h2 class="fw-bold text-center mb-2">Most Visited Places</h2>
-    <p class="text-center text-muted mb-4">Slide through Pampanga’s top destinations and find your next adventure.</p>
+    <p class="text-center text-muted mb-4">Slide through Pampanga's top destinations and find your next adventure.</p>
     
     <div class="slider-container d-flex overflow-auto gap-4 px-3">
-        <div class="place-card text-white position-relative rounded overflow-hidden flex-shrink-0" style="width: 22rem; height: 18rem;">
-            <img src="{{ asset('img/cards/angeles.webp') }}" class="img-fluid w-100 h-100 object-fit-cover" alt="Angeles">
-            <div class="position-absolute bottom-0 start-0 p-3 bg-opacity-50 bg-dark w-100">
-                <h5 class="fw-bold mb-0">Angeles, Philippines</h5>
+        @foreach($destinationStats->take(4) as $destination)
+            <div class="place-card text-white position-relative rounded overflow-hidden flex-shrink-0" style="width: 22rem; height: 18rem;">
+                @if($destination['image'])
+                    <img src="{{ asset('storage/' . $destination['image']) }}" 
+                         class="img-fluid w-100 h-100 object-fit-cover" 
+                         alt="{{ $destination['name'] }}">
+                @else
+                    <img src="{{ asset('img/cards/default.webp') }}" 
+                         class="img-fluid w-100 h-100 object-fit-cover" 
+                         alt="{{ $destination['name'] }}">
+                @endif
+                <div class="position-absolute bottom-0 start-0 p-3 bg-opacity-50 bg-dark w-100">
+                    <h5 class="fw-bold mb-0">{{ $destination['name'] }}, Philippines</h5>
+                    <small class="text-white-50">{{ Str::limit($destination['description'], 50) }} 
+                        <a href="javascript:void(0)" class="text-white read-more">Read more</a>
+                    </small>
+                </div>
+                <div class="full-description position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-75 d-none">
+                    <div class="p-4 text-white h-100 overflow-auto">
+                        <h5 class="fw-bold mb-3">{{ $destination['name'] }}, Philippines</h5>
+                        <p>{{ $destination['description'] }}</p>
+                        <small class="position-absolute bottom-0 end-0 p-3">Click anywhere to close</small>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="place-card text-white position-relative rounded overflow-hidden flex-shrink-0" style="width: 22rem; height: 18rem;">
-            <img src="{{ asset('img/cards/magalang.webp') }}" class="img-fluid w-100 h-100 object-fit-cover" alt="Magalang">
-            <div class="position-absolute bottom-0 start-0 p-3 bg-opacity-50 bg-dark w-100">
-                <h5 class="fw-bold mb-0">Magalang, Philippines</h5>
-            </div>
-        </div>
-        <div class="place-card text-white position-relative rounded overflow-hidden flex-shrink-0" style="width: 22rem; height: 18rem;">
-            <img src="{{ asset('img/cards/mabalacat.webp') }}" class="img-fluid w-100 h-100 object-fit-cover" alt="Mabalacat">
-            <div class="position-absolute bottom-0 start-0 p-3 bg-opacity-50 bg-dark w-100">
-                <h5 class="fw-bold mb-0">Mabalacat, Philippines</h5>
-            </div>
-        </div>
-        <div class="place-card text-white position-relative rounded overflow-hidden flex-shrink-0" style="width: 22rem; height: 18rem;">
-            <img src="{{ asset('img/cards/mabalacat.webp') }}" class="img-fluid w-100 h-100 object-fit-cover" alt="Clark">
-            <div class="position-absolute bottom-0 start-0 p-3 bg-opacity-50 bg-dark w-100">
-                <h5 class="fw-bold mb-0">Coffee Cat, Angeles</h5>
-            </div>
-        </div>
+        @endforeach
     </div>
 </section>
-
 <section class="mb-5 bg-white p-4 rounded" id="itineraries">
     <div class="row g-5">
         <!-- Saved Itineraries -->
         <div class="col-md-12 d-flex flex-column">
             <h3 class="fw-bold text-center mb-2">Saved Itineraries</h3>
             <div class="saved-itineraries-slider d-flex gap-3 overflow-auto p-3 rounded shadow-sm flex-grow-1">
-                <div class="itinerary-card card rounded shadow-sm flex-shrink-0" style="min-width: 24rem; height: 15rem;">
-                    <div class="card-body d-flex flex-column justify-content-center align-items-center">
-                        <h4 class="card-title fw-bold">Adventure in Angeles</h4>
-                        <p class="card-text text-muted">Explore Angeles City with this 1-day itinerary.</p>
-                        <a href="/saved-itinerary" class="btn btn-outline-primary btn-lg rounded-pill mt-2">View Itinerary</a>
+                @if($savedItineraries->isEmpty())
+                    <div class="itinerary-card card rounded shadow-sm flex-shrink-0" style="min-width: 24rem; height: 15rem;">
+                        <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                            <h4 class="card-title fw-bold">No Itineraries Yet</h4>
+                            <p class="card-text text-muted">Start planning your adventure today!</p>
+                            <a href="{{ route('index') }}" class="btn btn-outline-primary btn-lg rounded-pill mt-2">Create Itinerary</a>
+                        </div>
                     </div>
-                </div>
-                <div class="itinerary-card card rounded shadow-sm flex-shrink-0" style="min-width: 24rem; height: 15rem;">
-                    <div class="card-body d-flex flex-column justify-content-center align-items-center">
-                        <h4 class="card-title fw-bold">Magalang Escape</h4>
-                        <p class="card-text text-muted">Enjoy the scenic beauty of Mount Arayat.</p>
-                        <a href="/saved-itinerary" class="btn btn-outline-primary btn-lg rounded-pill mt-2">View Itinerary</a>
-                    </div>
-                </div>
-                <div class="itinerary-card card rounded shadow-sm flex-shrink-0" style="min-width: 24rem; height: 15rem;">
-                    <div class="card-body d-flex flex-column justify-content-center align-items-center">
-                        <h4 class="card-title fw-bold">Clark Gateway</h4>
-                        <p class="card-text text-muted">Discover Clark's top attractions in a day.</p>
-                        <a href="/saved-itinerary" class="btn btn-outline-primary btn-lg rounded-pill mt-2">View Itinerary</a>
-                    </div>
-                </div>
+                @else
+                    @foreach($savedItineraries as $itinerary)
+                        <div class="itinerary-card card rounded shadow-sm flex-shrink-0" style="min-width: 24rem; height: 15rem;">
+                            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                                <h4 class="card-title fw-bold">{{ $itinerary->name }}</h4>
+                                <p class="card-text text-muted">
+                                    {{ count($itinerary->itinerary_data) }} destinations • {{ $itinerary->duration_hours }} hours
+                                </p>
+                                <a href="{{ route('saved-itinerary') }}" class="btn btn-custom btn-lg rounded-pill mt-2">View Itinerary</a>
+                            </div>
+                        </div>
+                    @endforeach
+                @endif
             </div>
 
             <div class="text-center mt-4">
-                <a href="/saved-itinerary" class="btn btn-custom rounded-pill">See All Itineraries</a>
+                <a href="{{ route('saved-itinerary') }}" class="btn btn-custom rounded-pill">See All Itineraries</a>
             </div>
         </div>
     </div>
@@ -204,41 +284,37 @@
         const walk = (x - startX) * 2; // Scroll-fast
         slider.scrollLeft = scrollLeft - walk;
     });
-</script>
 
-<!-- saved itinerary slider -->
-<script>
-    const itinerarySlider = document.querySelector('.saved-itineraries-slider');
+function showFullDescription(event, name, description) {
+    event.preventDefault();
+    const card = event.target.closest('.place-card');
+    const fullDescription = card.querySelector('.full-description');
+    fullDescription.style.display = 'block';
+}
 
-let isDown = false;
-let startX;
-let scrollLeft;
+function hideDescription(event, element) {
+    event.stopPropagation();
+    element.style.display = 'none';
+}
 
-itinerarySlider.addEventListener('mousedown', (e) => {
-    isDown = true;
-    itinerarySlider.classList.add('active');
-    startX = e.pageX - itinerarySlider.offsetLeft;
-    scrollLeft = itinerarySlider.scrollLeft;
+document.addEventListener('DOMContentLoaded', function() {
+    // Add click listeners to all "Read more" links
+    document.querySelectorAll('.read-more').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const card = this.closest('.place-card');
+            const fullDescription = card.querySelector('.full-description');
+            fullDescription.classList.remove('d-none');
+        });
+    });
+
+    // Add click listeners to all full description divs
+    document.querySelectorAll('.full-description').forEach(div => {
+        div.addEventListener('click', function() {
+            this.classList.add('d-none');
+        });
+    });
 });
-
-itinerarySlider.addEventListener('mouseleave', () => {
-    isDown = false;
-    itinerarySlider.classList.remove('active');
-});
-
-itinerarySlider.addEventListener('mouseup', () => {
-    isDown = false;
-    itinerarySlider.classList.remove('active');
-});
-
-itinerarySlider.addEventListener('mousemove', (e) => {
-    if (!isDown) return;
-    e.preventDefault();
-    const x = e.pageX - itinerarySlider.offsetLeft;
-    const walk = (x - startX) * 2; // Adjust scroll speed
-    itinerarySlider.scrollLeft = scrollLeft - walk;
-});
-
 
     </script>
 
